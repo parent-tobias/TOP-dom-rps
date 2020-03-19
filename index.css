@@ -15,8 +15,6 @@ h1, h2, h3, h4, h5, h6 {
  * Reset button styles.
  * It takes a bit of work to achieve a neutral look.
  */
-  padding: 0;
-  border: none;
   font: inherit;
   color: inherit;
   background-color: transparent;
@@ -30,6 +28,9 @@ h1, h2, h3, h4, h5, h6 {
      */
      .player-pane .btn {
       /* default for <button>, but needed for <a> */
+      padding: 0;
+      border: none;
+
       display: inline-block;
       text-align: left;
       white-space: nowrap;
