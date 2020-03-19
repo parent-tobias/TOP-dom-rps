@@ -2,8 +2,18 @@ var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
 var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
 var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
 
+
 const options = ['rock','paper','scissors'];
-const grammar = `#JSCF V1.0; grammar playoptions; public <playoption>=${options.join("|")};`;
+// const grammar = `#JSCF V1.0; grammar playoptions; public <playoption>=${options.join("|")};`;
+const grammar = `#JSCF V1.0;`;
+
+/***
+ * Going to start trying to work voice recognition in
+ */
+const recognition = new SpeechRecognition();
+const speechRecognitionList = new SpeechGrammarList();
+speechRecognitionList.addFromString(grammar, 1);
+
 const gameStats = {
   scores: {
     player: 0,
@@ -46,6 +56,10 @@ const whoWon = (player, computer) =>{
 }
 
 const playRound = (playerSelection) => {
+  playerSelection = playerSelection.trim();
+    console.log(`does [${options.join(", ")}] include ${playerSelection.trim()}? ${options.includes(playerSelection)? "Yep!": "Nope..."}`);
+
+  if(!options.includes(playerSelection)) return;
   // const playerSelection = event.target.value;
   const computerSelection = computerPlay();
   const wonThisRound = whoWon(playerSelection, computerSelection );
@@ -93,6 +107,9 @@ const updateScoresDisplay = () => {
 
 const checkIfGamesOver = () =>{
   if(gameStats.scores.player >= 5 || gameStats.scores.computer >= 5){
+    recognition.stop();
+    gameEls.playerPane.querySelector(".play-game").removeAttribute("disabled");
+    gameEls.playerPane.querySelector(".play-game").textContent = "Play again!";
     const resultEl = document.createElement("p");
     resultEl.textContent = `Game Over. ${gameStats.scores.player>=5 ? "Player" : "Computer"} won!`;
     gameEls.resultsPane.insertBefore(resultEl, gameEls.resultsPane.querySelector("p"));
@@ -104,16 +121,10 @@ const checkIfGamesOver = () =>{
 }
 
 const gameStart = () => {
-  /***
-   * Going to start trying to work voice recognition in
-   */
-  const recognition = new SpeechRecognition();
-  const speechRecognitionList = new SpeechGrammarList();
-  speechRecognitionList.addFromString(grammar, 1);
 
   // now to set the properties on the SpeechRecognition...
   recognition.grammars = speechRecognitionList;
-  recognition.continuous = false; // stop at the first valid
+  recognition.continuous = true; // stop at the first valid
   recognition.lang = "en-US";
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
@@ -128,13 +139,16 @@ const gameStart = () => {
       playRound(playerOption);
     });
   })
-  gameEls.playerPane.querySelector(".next-round").addEventListener("click", (e) =>{
+  gameEls.playerPane.querySelector(".play-game").addEventListener("click", (e) =>{
     recognition.start();
+    e.target.setAttribute("disabled", true);
+    e.target.textContent = "Game in progress..."
     console.log("Listening for player option.");
     recognition.onresult = event => {
-      const playerOption = event.results[0][0].transcript.toLowerCase();
-      console.log(`We are ${Number(event.results[0][0].confidence).toFixed(2)}% sure you said ${playerOption}.`)
-      if(options.includes(playerOption))
+      const playerOption = event.results[event.results.length-1][0].transcript.toLowerCase();
+      console.log(`We are ${Number( (event.results[event.results.length-1][0].confidence*100 ) ).toFixed(2)}% sure you said ${playerOption}.`)
+
+      
         playRound(playerOption)
     };
   })
