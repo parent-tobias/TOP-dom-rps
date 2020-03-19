@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Rock Paper Scissors Console Madness</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="./index.css" rel="stylesheet">
+  </head>
+  <body>
+    <article class="intro-screen">
+      <header>
+        <h1>Rock Paper Scissors</h1>
+        <h2>Gettin' all handsy</h2>
+      </header>
+      <p>You know the deal, you know the drill, you know the game. Rock-paper-scissors. You pick one, the computer picks one, and one of you randomly wins. Or you tie. First to five wins.</p>
+      <p>Scoring is zero for a tie, and one for a win. Rock beats scissors, scissors beat paper, and paper beats rock.</p>
+      <p>When you're ready... <button class="start-game">click here</button></p>
+    </article>
+    <article class="game-container is-hidden">
+      <section class="score-pane">
+        <span>Player: <span class="player-score"></span></span>
+        <span>Round <span class="round-count"></span></span>
+        <span>Computer: <span class="computer-score"></span></span>
+      </section>
+      <section class="player-pane">
+        <button class="player-option btn rock" value="rock">Rock</button>
+        <button class="player-option btn paper" value="paper">Paper</button>
+        <button class="player-option btn scissors" value="scissors">Scissors</button>
+      </section>
+      <section class="results-pane">
+        <h2>Results so far...</h2>
+      </section>
+    </article>
+    <script src="./index.js"></script>
+  </body>
+</html>
