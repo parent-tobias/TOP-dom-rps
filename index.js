@@ -1,4 +1,9 @@
+var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
+var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
+
 const options = ['rock','paper','scissors'];
+const grammar = `#JSCF V1.0; grammar playoptions; public <playoption>=${options.join("|")};`;
 const gameStats = {
   scores: {
     player: 0,
@@ -99,6 +104,19 @@ const checkIfGamesOver = () =>{
 }
 
 const gameStart = () => {
+  /***
+   * Going to start trying to work voice recognition in
+   */
+  const recognition = new SpeechRecognition();
+  const speechRecognitionList = new SpeechGrammarList();
+  speechRecognitionList.addFromString(grammar, 1);
+
+  // now to set the properties on the SpeechRecognition...
+  recognition.grammars = speechRecognitionList;
+  recognition.continuous = false; // stop at the first valid
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
   let result;
 
   gameEls.introContainer.classList.toggle("is-hidden");
