@@ -45,8 +45,8 @@ const whoWon = (player, computer) =>{
   }
 }
 
-const playRound = (event) => {
-  const playerSelection = event.target.value;
+const playRound = (playerSelection) => {
+  // const playerSelection = event.target.value;
   const computerSelection = computerPlay();
   const wonThisRound = whoWon(playerSelection, computerSelection );
   console.log(wonThisRound)
@@ -117,12 +117,26 @@ const gameStart = () => {
   recognition.lang = "en-US";
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
+
   let result;
 
   gameEls.introContainer.classList.toggle("is-hidden");
   gameEls.gameContainer.classList.toggle("is-hidden");
   gameEls.playerPane.querySelectorAll(".player-option").forEach(option =>{
-    option.addEventListener("click", playRound);
+    option.addEventListener("click", event =>{
+      const playerOption = event.target.value;
+      playRound(playerOption);
+    });
+  })
+  gameEls.playerPane.querySelector(".next-round").addEventListener("click", (e) =>{
+    recognition.start();
+    console.log("Listening for player option.");
+    recognition.onresult = event => {
+      const playerOption = event.results[0][0].transcript.toLowerCase();
+      console.log(`We are ${Number(event.results[0][0].confidence).toFixed(2)}% sure you said ${playerOption}.`)
+      if(options.includes(playerOption))
+        playRound(playerOption)
+    };
   })
 }
 const gameEnd = () =>{
