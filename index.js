@@ -3,7 +3,7 @@ var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
 var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
 
 
-const options = ['rock','paper','scissors'];
+const options = ['rock', 'paper', 'scissors'];
 // const grammar = `#JSCF V1.0; grammar playoptions; public <playoption>=${options.join("|")};`;
 const grammar = `#JSCF V1.0;`;
 
@@ -14,13 +14,14 @@ const recognition = new SpeechRecognition();
 const speechRecognitionList = new SpeechGrammarList();
 speechRecognitionList.addFromString(grammar, 1);
 
-const gameStats = {
+let gameStats = {
   scores: {
     player: 0,
     computer: 0
   },
   rounds: []
-}
+};
+
 const gameEls = {
   introContainer: document.querySelector(".intro-screen"),
   gameContainer: document.querySelector(".game-container"),
@@ -30,43 +31,43 @@ const gameEls = {
 }
 
 const playerPlay = () => {
-  let selection="";
-  while(!options.includes(selection.toLowerCase())){
+  let selection = "";
+  while (!options.includes(selection.toLowerCase())) {
     selection = prompt("Rock, Paper or Scissors", "rock")
   }
   return selection;
 }
 const computerPlay = () => {
-  return options[Math.floor(Math.random()*options.length)]
+  return options[Math.floor(Math.random() * options.length)]
 }
-const whoWon = (player, computer) =>{
+const whoWon = (player, computer) => {
   // the ties, we handle right off.
-  if(player==computer) return 0;
-  switch(player){
+  if (player == computer) return 0;
+  switch (player) {
     case "rock":
-      if(computer=="paper") return -1;
+      if (computer == "paper") return -1;
       return 1;
     case "paper":
-      if(computer=="scissors") return -1;
+      if (computer == "scissors") return -1;
       return 1;
     case "scissors":
-      if(computer=="rock") return -1;
+      if (computer == "rock") return -1;
       return 1;
   }
 }
 
 const playRound = (playerSelection) => {
   playerSelection = playerSelection.trim();
-    console.log(`does [${options.join(", ")}] include ${playerSelection.trim()}? ${options.includes(playerSelection)? "Yep!": "Nope..."}`);
+  console.log(`does [${options.join(", ")}] include ${playerSelection.trim()}? ${options.includes(playerSelection)? "Yep!": "Nope..."}`);
 
-  if(!options.includes(playerSelection)) return;
+  if (!options.includes(playerSelection)) return;
   // const playerSelection = event.target.value;
   const computerSelection = computerPlay();
-  const wonThisRound = whoWon(playerSelection, computerSelection );
+  const wonThisRound = whoWon(playerSelection, computerSelection);
   console.log(wonThisRound)
   let result;
 
-  switch(wonThisRound){
+  switch (wonThisRound) {
     case 0:
       result = {
         message: `It's a tie: ${playerSelection} and ${computerSelection}`,
@@ -76,17 +77,17 @@ const playRound = (playerSelection) => {
       break;
     case 1:
       result = {
-        message:  `You won! ${playerSelection} beats ${computerSelection}`,
+        message: `You won! ${playerSelection} beats ${computerSelection}`,
         player: 1,
         computer: 0
       };
       break;
     default:
       result = {
-      message:   `You lose. ${computerSelection} beats ${playerSelection}`,
-      player: 0,
-      computer: 1
-    };
+        message: `You lose. ${computerSelection} beats ${playerSelection}`,
+        player: 0,
+        computer: 1
+      };
   }
   gameStats.rounds.push(result);
   gameStats.scores.player += result.player;
@@ -105,8 +106,8 @@ const updateScoresDisplay = () => {
   gameEls.resultsPane.insertBefore(resultEl, gameEls.resultsPane.querySelector("p"));
 }
 
-const checkIfGamesOver = () =>{
-  if(gameStats.scores.player >= 5 || gameStats.scores.computer >= 5){
+const checkIfGamesOver = () => {
+  if (gameStats.scores.player >= 5 || gameStats.scores.computer >= 5) {
     recognition.stop();
     gameEls.playerPane.querySelector(".play-game").removeAttribute("disabled");
     gameEls.playerPane.querySelector(".play-game").textContent = "Play again!";
@@ -114,9 +115,9 @@ const checkIfGamesOver = () =>{
     resultEl.textContent = `Game Over. ${gameStats.scores.player>=5 ? "Player" : "Computer"} won!`;
     gameEls.resultsPane.insertBefore(resultEl, gameEls.resultsPane.querySelector("p"));
 
-    gameEls.playerPane.querySelectorAll(".player-option").forEach(option =>{
+    gameEls.playerPane.querySelectorAll(".player-option").forEach(option => {
       option.removeEventListener("click", playRound);
-    })    
+    })
   }
 }
 
@@ -133,27 +134,34 @@ const gameStart = () => {
 
   gameEls.introContainer.classList.toggle("is-hidden");
   gameEls.gameContainer.classList.toggle("is-hidden");
-  gameEls.playerPane.querySelectorAll(".player-option").forEach(option =>{
-    option.addEventListener("click", event =>{
+  gameEls.playerPane.querySelectorAll(".player-option").forEach(option => {
+    option.addEventListener("click", event => {
       const playerOption = event.target.value;
       playRound(playerOption);
     });
   })
-  gameEls.playerPane.querySelector(".play-game").addEventListener("click", (e) =>{
+  gameEls.playerPane.querySelector(".play-game").addEventListener("click", (e) => {
     recognition.start();
+    gameStats = {
+      scores: {
+        player: 0,
+        computer: 0
+      },
+      rounds: []
+    }
     e.target.setAttribute("disabled", true);
     e.target.textContent = "Game in progress..."
     console.log("Listening for player option.");
     recognition.onresult = event => {
-      const playerOption = event.results[event.results.length-1][0].transcript.toLowerCase();
+      const playerOption = event.results[event.results.length - 1][0].transcript.toLowerCase();
       console.log(`We are ${Number( (event.results[event.results.length-1][0].confidence*100 ) ).toFixed(2)}% sure you said ${playerOption}.`)
 
-      
-        playRound(playerOption)
+
+      playRound(playerOption)
     };
   })
 }
-const gameEnd = () =>{
+const gameEnd = () => {
 
 }
 
